@@ -2,9 +2,12 @@ package com.prajval.roomReservationSystem.service.impl;
 
 import com.prajval.roomReservationSystem.dto.HotelDto;
 import com.prajval.roomReservationSystem.entity.Hotel;
+import com.prajval.roomReservationSystem.entity.Room;
 import com.prajval.roomReservationSystem.exceptions.ResourceNotFoundException;
 import com.prajval.roomReservationSystem.repository.HotelRepository;
 import com.prajval.roomReservationSystem.service.HotelService;
+import com.prajval.roomReservationSystem.service.InventoryService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class HotelServiceImpl implements HotelService {
 
     private final HotelRepository hotelRepository;
+    private final InventoryService inventoryService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -53,13 +57,20 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional
     public void deleteHotelById(Long id) {
+        Hotel hotel = hotelRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found with Id" + id));
 
-        boolean exists = hotelRepository.existsById(id);
-        if(!exists) throw new ResourceNotFoundException("Hotel Not Found with Id" + id);
         hotelRepository.deleteById(id);
+
+        for (Room room : hotel.getRooms()){
+            inventoryService.deleteFutureInventories(room);
+        }
     }
 
+    @Transactional
     @Override
     public void activateHotel(Long hotelId) {
 
@@ -68,6 +79,12 @@ public class HotelServiceImpl implements HotelService {
                 .findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found with Id: " + hotelId));
         hotel.setActive(true);
+
+
+        for (Room room : hotel.getRooms()){
+            inventoryService.initializeRoomForAYear(room);
+        }
+
     }
 
 

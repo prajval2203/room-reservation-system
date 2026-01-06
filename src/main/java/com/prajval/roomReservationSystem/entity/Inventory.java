@@ -1,8 +1,7 @@
 package com.prajval.roomReservationSystem.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -18,6 +17,9 @@ import java.time.LocalDateTime;
                 name = "unique_hotel_room_date",
                 columnNames = "hotel_id, room_id, date")
 )
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Inventory {
 
     @Id
@@ -35,7 +37,7 @@ public class Inventory {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(unique = true, columnDefinition = "INTEGER DEFAULT 0")
+    @Column( columnDefinition = "INTEGER DEFAULT 0")
     private Integer bookedCount;
 
     @Column(nullable = false)

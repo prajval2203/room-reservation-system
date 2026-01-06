@@ -6,6 +6,7 @@ import com.prajval.roomReservationSystem.entity.Room;
 import com.prajval.roomReservationSystem.exceptions.ResourceNotFoundException;
 import com.prajval.roomReservationSystem.repository.HotelRepository;
 import com.prajval.roomReservationSystem.repository.RoomRepository;
+import com.prajval.roomReservationSystem.service.InventoryService;
 import com.prajval.roomReservationSystem.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
     private final HotelRepository hotelRepository;
+    private final InventoryService inventoryService;
 
 
     @Override
@@ -35,7 +37,12 @@ public class RoomServiceImpl implements RoomService {
         room.setHotel(hotel);
         room = roomRepository.save(room);
 
+        if(hotel.getActive()){
+            inventoryService.initializeRoomForAYear(room);
+        }
+
         return modelMapper.map(room, RoomDto.class);
+
     }
 
     @Override
@@ -65,11 +72,11 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void deleteRoomById(Long roomId) {
         log.info("Deleting Room with ID: {}", roomId);
-        boolean exists = roomRepository.existsById(roomId);
-        if(! exists){
-            throw new ResourceNotFoundException("Room not found with ID: " + roomId);
-        }
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found with Id" + roomId));
         roomRepository.deleteById(roomId);
-
+        inventoryService.deleteFutureInventories(room);
+        // todo: delete all the future inventory for this.
     }
 }
