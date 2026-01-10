@@ -1,8 +1,10 @@
 package com.prajval.roomReservationSystem.entity.enums;
 
 public enum BookingStatus {
-
-    PENDING,
+    RESERVED,
+    GUESTS_ADDED,
+    PAYMENT_PENDING,
     CANCELLED,
-    CONFIRMED
+    CONFIRMED,
+    EXPIRED
 }

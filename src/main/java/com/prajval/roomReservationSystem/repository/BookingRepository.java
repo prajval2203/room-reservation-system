@@ -1,9 +1,9 @@
 package com.prajval.roomReservationSystem.repository;
 
-import com.prajval.roomReservationSystem.entity.Hotel;
+import com.prajval.roomReservationSystem.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HotelRepository extends JpaRepository<Hotel, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
 }
