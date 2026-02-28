@@ -7,12 +7,14 @@ import com.prajval.roomReservationSystem.dto.HotelSearchRequest;
 import com.prajval.roomReservationSystem.entity.*;
 import com.prajval.roomReservationSystem.entity.enums.BookingStatus;
 import com.prajval.roomReservationSystem.exceptions.ResourceNotFoundException;
+import com.prajval.roomReservationSystem.exceptions.UnAuthorizedException;
 import com.prajval.roomReservationSystem.repository.*;
 import com.prajval.roomReservationSystem.service.BookingService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -92,6 +94,12 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with Id: " +bookingId));
 
+        User user = getCurrentUser();
+
+        if (!user.equals(booking.getUser())){
+            throw new UnAuthorizedException("Booking does not belong to this user with id: " + user.getId());
+        }
+
         if (hasBookingExpired(booking)){
             throw new IllegalStateException("Booking has already expired");
         }
@@ -116,8 +124,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public User getCurrentUser(){
-        User user = new User();
-        user.setId(1L);     // TODO: remove dummy user.
-        return user;
+        return
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

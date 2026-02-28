@@ -2,6 +2,6 @@ package com.prajval.roomReservationSystem.entity.enums;
 
 public enum Role {
 
-    USER,
+    GUEST,
     HOTEL_MANAGER
 }
