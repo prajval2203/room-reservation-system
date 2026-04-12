@@ -1,5 +1,6 @@
 package com.prajval.roomReservationSystem.entity;
 
+import com.prajval.roomReservationSystem.entity.enums.Gender;
 import com.prajval.roomReservationSystem.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,11 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String name;
+
+    private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

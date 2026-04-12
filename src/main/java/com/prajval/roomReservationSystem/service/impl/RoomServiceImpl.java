@@ -10,14 +10,15 @@ import com.prajval.roomReservationSystem.repository.HotelRepository;
 import com.prajval.roomReservationSystem.repository.RoomRepository;
 import com.prajval.roomReservationSystem.service.InventoryService;
 import com.prajval.roomReservationSystem.service.RoomService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import static com.prajval.roomReservationSystem.util.AppUtils.getCurrentUser;
 
 @Service
 @Slf4j
@@ -98,5 +99,28 @@ public class RoomServiceImpl implements RoomService {
         roomRepository.deleteById(roomId);
         inventoryService.deleteAllInventories(room);
         // todo: delete all the future inventory for this.
+    }
+
+    @Override
+    @Transactional
+    public RoomDto updateRoomById(Long hotelId, Long roomId, RoomDto roomDto) {
+
+        log.info("Updating Room with ID: {}", roomId);
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found with Id" + hotelId));
+
+        User user = getCurrentUser();
+        if (!user.equals(hotel.getOwner())){
+            throw new UnAuthorizedException("This user does not own this hotel with id: " +hotelId);
+        }
+        Room room = roomRepository.findById(roomId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Room Not Found with Id" + roomId));
+
+        modelMapper.map(roomDto, room);
+        room.setId(roomId);
+        room = roomRepository.save(room);
+
+        return modelMapper.map(room, RoomDto.class);
     }
 }

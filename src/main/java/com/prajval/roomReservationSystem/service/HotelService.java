@@ -2,6 +2,7 @@ package com.prajval.roomReservationSystem.service;
 
 import com.prajval.roomReservationSystem.dto.HotelDto;
 import com.prajval.roomReservationSystem.dto.HotelInfoDto;
+import java.util.List;
 
 public interface HotelService {
 
@@ -16,4 +17,6 @@ public interface HotelService {
     void activateHotel(Long hotelId);
 
     HotelInfoDto getHotelInfoById(Long hotelId);
+
+    List<HotelDto> getAllHotels();
 }

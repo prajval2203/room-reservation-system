@@ -1,7 +1,6 @@
 package com.prajval.roomReservationSystem.service;
 
 import com.prajval.roomReservationSystem.dto.RoomDto;
-
 import java.util.List;
 
 public interface RoomService {
@@ -13,4 +12,6 @@ public interface RoomService {
     RoomDto getRoomById(Long roomId);
 
     void deleteRoomById(Long roomId);
+
+    RoomDto updateRoomById(Long hotelId, Long roomId, RoomDto roomDto);
 }

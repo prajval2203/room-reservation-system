@@ -1,10 +1,9 @@
 package com.prajval.roomReservationSystem.service;
 
-import com.prajval.roomReservationSystem.dto.HotelDto;
-import com.prajval.roomReservationSystem.dto.HotelPriceDto;
-import com.prajval.roomReservationSystem.dto.HotelSearchRequest;
+import com.prajval.roomReservationSystem.dto.*;
 import com.prajval.roomReservationSystem.entity.Room;
 import org.springframework.data.domain.Page;
+import java.util.List;
 
 public interface InventoryService {
 
@@ -13,4 +12,8 @@ public interface InventoryService {
     void deleteAllInventories(Room room);
 
     Page<HotelPriceDto> searchHotels(HotelSearchRequest hotelSearchRequest);
+
+    List<InventoryDto> getAllInventoryByRoom(Long roomId);
+
+    void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto);
 }

@@ -1,25 +1,29 @@
 package com.prajval.roomReservationSystem.service.impl;
 
-import com.prajval.roomReservationSystem.dto.HotelDto;
-import com.prajval.roomReservationSystem.dto.HotelPriceDto;
-import com.prajval.roomReservationSystem.dto.HotelSearchRequest;
-import com.prajval.roomReservationSystem.entity.Hotel;
+import com.prajval.roomReservationSystem.dto.*;
 import com.prajval.roomReservationSystem.entity.Inventory;
 import com.prajval.roomReservationSystem.entity.Room;
+import com.prajval.roomReservationSystem.entity.User;
+import com.prajval.roomReservationSystem.exceptions.ResourceNotFoundException;
 import com.prajval.roomReservationSystem.repository.HotelMinPriceRepository;
 import com.prajval.roomReservationSystem.repository.InventoryRepository;
+import com.prajval.roomReservationSystem.repository.RoomRepository;
 import com.prajval.roomReservationSystem.service.InventoryService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
+import static com.prajval.roomReservationSystem.util.AppUtils.getCurrentUser;
 
 @Service
 @Slf4j
@@ -29,6 +33,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final HotelMinPriceRepository hotelMinPriceRepository;
+    private final RoomRepository roomRepository;
 
 
     @Override
@@ -75,5 +80,40 @@ public class InventoryServiceImpl implements InventoryService {
                 dateCount, pageable);
 
         return hotelPage;
+    }
+
+    @Override
+    public List<InventoryDto> getAllInventoryByRoom(Long roomId) {
+        log.info("Getting all inventory by room for room with id: {}" , roomId);
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " +roomId));
+
+        User user = getCurrentUser();
+        if (!user.equals(room.getHotel().getOwner())) throw  new AccessDeniedException("You are not the Owner");
+
+        return inventoryRepository.findByRoomOrderByDate(room)
+                .stream()
+                .map((element) -> modelMapper.map(element, InventoryDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto) {
+        log.info("Updating all inventory by room for room with id: {} between date range :{} - {}" , roomId,
+                updateInventoryRequestDto.getStartDate(), updateInventoryRequestDto.getEndDate());
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " +roomId));
+
+        User user = getCurrentUser();
+        if (!user.equals(room.getHotel().getOwner())) throw  new AccessDeniedException("You are not the Owner");
+
+        inventoryRepository.getInventoryAndLockBeforeUpdate(roomId, updateInventoryRequestDto.getStartDate(),
+                updateInventoryRequestDto.getEndDate());
+
+        inventoryRepository.updateInventory(roomId, updateInventoryRequestDto.getStartDate(),
+                updateInventoryRequestDto.getEndDate(), updateInventoryRequestDto.getClosed(),
+                updateInventoryRequestDto.getSurgeFactor());
     }
 }
