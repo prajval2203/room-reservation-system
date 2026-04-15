@@ -55,5 +55,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return modelMapper.map(getCurrentUser(), UserDto.class);
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .orElse(null);
+    }
+
+    @Override
+    public User save(User newUser) {
+        return userRepository.save(newUser);
+    }
+
 
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth2 Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .box {
+            padding: 15px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        h2 {
+            color: green;
+        }
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Google Login Successful</h2>
+
+<div class="box">
+    <h3>Access Token (JWT)</h3>
+    <p id="accessToken"></p>
+</div>
+
+<div class="box">
+    <h3>Decoded Token Payload</h3>
+    <pre id="decodedPayload"></pre>
+</div>
+
+<div class="box">
+    <h3>Refresh Token</h3>
+    <p>
+        Refresh token is stored in <b>HttpOnly Cookie</b>.<br>
+        It cannot be accessed via JavaScript (for security reasons).
+    </p>
+</div>
+
+<button onclick="logout()">Logout</button>
+
+<script>
+    // Get token from URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+        document.getElementById("accessToken").innerText = token;
+
+        // Decode JWT payload
+        const payload = token.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        document.getElementById("decodedPayload").innerText =
+            JSON.stringify(decoded, null, 4);
+    } else {
+        document.getElementById("accessToken").innerText = "No token found!";
+    }
+
+    function logout() {
+        window.location.href = "/logout";
+    }
+</script>
+
+</body>
+</html>
