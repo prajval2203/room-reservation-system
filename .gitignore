@@ -17,6 +17,7 @@ Thumbs.db
 # ---- Environment & Secrets ----
 application-local.properties
 application.yml
+docker-compose.yml
 .env
 *.secret
 *.key
