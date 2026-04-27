@@ -283,7 +283,7 @@ public class BookingServiceImpl implements BookingService {
 
         List<Booking> bookings = bookingRepository.findByHotelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
 
-        Long totalConfirmedBookings = bookings
+        long totalConfirmedBookings = bookings
                 .stream()
                 .filter(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
                 .count();

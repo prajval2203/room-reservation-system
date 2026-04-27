@@ -15,7 +15,7 @@ build/
 Thumbs.db
 
 # ---- Environment & Secrets ----
-application.properties
+application-local.properties
 application.yml
 .env
 *.secret

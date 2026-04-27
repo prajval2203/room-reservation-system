@@ -1,7 +1,6 @@
 package com.prajval.roomReservationSystem.dto;
 
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data

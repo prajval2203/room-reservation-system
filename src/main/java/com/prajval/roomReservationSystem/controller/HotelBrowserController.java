@@ -1,6 +1,5 @@
 package com.prajval.roomReservationSystem.controller;
 
-import com.prajval.roomReservationSystem.dto.HotelDto;
 import com.prajval.roomReservationSystem.dto.HotelInfoDto;
 import com.prajval.roomReservationSystem.dto.HotelPriceDto;
 import com.prajval.roomReservationSystem.dto.HotelSearchRequest;
