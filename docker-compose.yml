@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  room-db:
+    image: postgres:15
+    container_name: room-db
+    environment:
+      POSTGRES_DB: roomReservationSystem
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Ashu@1999
+    volumes:
+      - room-db-data:/var/lib/postgresql/data
+    networks:
+      - myNetworks
+
+  room-reservation-app:
+    build: .
+    container_name: room-reservation-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - myNetworks
+    depends_on:
+      - room-db
+
+volumes:
+  room-db-data:
+
+networks:
+  myNetworks:
